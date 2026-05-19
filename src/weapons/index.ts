@@ -1,6 +1,6 @@
 // Weapons stub — replaced by Task 3.
 // Contract: see src/engine/types.ts (WeaponsAPI, WeaponSpec).
-import type { Engine, PlayerAPI, WeaponsAPI, WeaponInstance, WeaponSpec, WeaponSlot, FireResult } from '../engine/types';
+import type { Engine, PlayerAPI, WeaponsAPI, WeaponInstance, WeaponSpec, WeaponSlot, FireResult, Team } from '../engine/types';
 
 const KNIFE: WeaponSpec = {
   id: 'knife', name: 'Knife', slot: 3,
@@ -13,9 +13,11 @@ export function createWeapons(_engine: Engine, _player: PlayerAPI): WeaponsAPI {
   const knife: WeaponInstance = { spec: KNIFE, ammoInMag: 0, reserveAmmo: 0 };
   const inv: WeaponInstance[] = [knife];
   let equipped = knife;
+  const fireSubs = new Set<(r: FireResult) => void>();
   return {
     inventory: inv,
     get equipped() { return equipped; },
+    catalog: [KNIFE],
     switchTo(slot: WeaponSlot) {
       const w = inv.find(i => i.spec.slot === slot);
       if (w) equipped = w;
@@ -33,6 +35,11 @@ export function createWeapons(_engine: Engine, _player: PlayerAPI): WeaponsAPI {
       const i = inv.findIndex(x => x.spec.slot === slot);
       if (i >= 0 && inv[i].spec.id !== 'knife') inv.splice(i, 1);
       equipped = inv[0];
+    },
+    buy(_id: string) { return false; },
+    onFire(cb) { fireSubs.add(cb); return () => fireSubs.delete(cb); },
+    resetLoadout(_team: Team) {
+      inv.length = 0; inv.push(knife); equipped = knife;
     },
   };
 }

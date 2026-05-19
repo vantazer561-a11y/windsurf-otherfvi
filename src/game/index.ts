@@ -14,5 +14,6 @@ export function createGame(_engine: Engine, _ctxRef: () => GameContext): GameAPI
     state,
     start() { state.phase = 'live'; state.roundNumber = 1; state.roundTime = 115; },
     onKill() {},
+    rewardKill() {},
   };
 }

@@ -114,12 +114,19 @@ export interface WeaponInstance {
 export interface WeaponsAPI {
   inventory: WeaponInstance[];
   equipped: WeaponInstance;
+  catalog: WeaponSpec[];
   switchTo(slot: WeaponSlot): void;
   /** Attempt to fire. Returns FireResult on actual shot, null if on cooldown / empty. */
   tryFire(): FireResult | null;
   reload(): void;
   give(spec: WeaponSpec): void;
   drop(slot: WeaponSlot): void;
+  /** Buy by spec.id. Deducts from PlayerAPI.money on success. Returns true if bought. */
+  buy(id: string): boolean;
+  /** Subscribe to fire events (for audio + bots reacting to gunshots). */
+  onFire(cb: (r: FireResult) => void): () => void;
+  /** Reset to default loadout (knife + starting pistol). */
+  resetLoadout(team: Team): void;
 }
 
 // ---------- HUD ----------
@@ -145,6 +152,8 @@ export interface BotsAPI {
   reset(): void;
   alive(team: Team): number;
   list(): Entity[];
+  /** Bots' shot event so audio + scoring know. */
+  onBotFire(cb: (shooter: Entity, hit: Entity | null, weaponId: string) => void): () => void;
 }
 
 // ---------- Game ----------
@@ -160,6 +169,8 @@ export interface GameAPI {
   state: GameState;
   start(): void;
   onKill(victim: Entity, attacker: Entity | undefined, weapon: WeaponSpec, headshot: boolean): void;
+  /** Player kill reward (CS 1.6: $300 default, $100 knife, $1500 awp etc.). Game decides. */
+  rewardKill(attacker: Entity, weapon: WeaponSpec): void;
 }
 
 // ---------- Audio ----------

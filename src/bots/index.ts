@@ -7,6 +7,7 @@ let nextId = 1000;
 
 export function createBots(engine: Engine): BotsAPI {
   let bots: Entity[] = [];
+  const subs = new Set<(s: Entity, h: Entity | null, w: string) => void>();
   return {
     spawn(team: Team, spawns: MapSpawn[]): Entity[] {
       const out: Entity[] = [];
@@ -34,5 +35,6 @@ export function createBots(engine: Engine): BotsAPI {
     },
     alive(team: Team) { return bots.filter(b => b.team === team && b.alive).length; },
     list() { return bots; },
+    onBotFire(cb) { subs.add(cb); return () => subs.delete(cb); },
   };
 }
