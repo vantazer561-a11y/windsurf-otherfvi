@@ -74,13 +74,26 @@ export function createPlayer(engine: Engine): PlayerAPI {
     input.mouseDX = 0;
     input.mouseDY = 0;
 
-    // Crouch & eye height
-    const targetEyeHeight = input.crouch ? CROUCH_EYE : STAND_EYE;
+    // Update hitbox height — enforce crouch if ceiling blocks standing up
+    let forcedCrouch = false;
+    if (!input.crouch) {
+      const standBox = new THREE.Box3(
+        new THREE.Vector3(entity.hitbox.min.x, entity.hitbox.min.y, entity.hitbox.min.z),
+        new THREE.Vector3(entity.hitbox.max.x, 1.8, entity.hitbox.max.z),
+      ).translate(entity.position);
+      for (const col of engine.colliders) {
+        if (standBox.intersectsBox(col)) {
+          forcedCrouch = true;
+          break;
+        }
+      }
+    }
+    entity.hitbox.max.y = (input.crouch || forcedCrouch) ? 1.2 : 1.8;
+
+    // Crouch & eye height — cap at crouch height if blocked by ceiling
+    const targetEyeHeight = (input.crouch || forcedCrouch) ? CROUCH_EYE : STAND_EYE;
     const lerpSpeed = 1.0 / CROUCH_TIME;
     currentEyeHeight += (targetEyeHeight - currentEyeHeight) * Math.min(1, dt * lerpSpeed);
-
-    // Update hitbox height
-    entity.hitbox.max.y = input.crouch ? 1.2 : 1.8;
 
     // Ground test
     grounded = testGround(entity.position, entity.hitbox, engine.colliders);
@@ -133,7 +146,12 @@ export function createPlayer(engine: Engine): PlayerAPI {
 
     // Move & collide
     const movement = entity.velocity.clone().multiplyScalar(dt);
-    resolveMovement(entity.position, entity.hitbox, movement, engine.colliders);
+    const { collidedY } = resolveMovement(entity.position, entity.hitbox, movement, engine.colliders);
+
+    // Re-test ground after movement; clamp downward velocity when grounded
+    grounded = testGround(entity.position, entity.hitbox, engine.colliders);
+    if (grounded && entity.velocity.y < 0) entity.velocity.y = 0;
+    if (collidedY && entity.velocity.y > 0) entity.velocity.y = 0;
 
     // Fallback ground plane for stub map with no colliders
     if (engine.colliders.length === 0 && entity.position.y < 0) {

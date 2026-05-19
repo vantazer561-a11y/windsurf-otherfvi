@@ -5,10 +5,12 @@ export function resolveMovement(
   hitbox: THREE.Box3,
   movement: THREE.Vector3,
   colliders: THREE.Box3[],
-) {
+): { collidedX: boolean; collidedZ: boolean; collidedY: boolean } {
+  const result = { collidedX: false, collidedZ: false, collidedY: false };
   const axes: Array<'x' | 'z' | 'y'> = ['x', 'z', 'y'];
 
   for (const axis of axes) {
+    const before = pos[axis];
     pos[axis] += movement[axis];
 
     const worldBox = new THREE.Box3().copy(hitbox).translate(pos);
@@ -23,7 +25,15 @@ export function resolveMovement(
         worldBox.copy(hitbox).translate(pos);
       }
     }
+
+    if (movement[axis] !== 0 && Math.abs(pos[axis] - (before + movement[axis])) > 1e-6) {
+      if (axis === 'x') result.collidedX = true;
+      if (axis === 'z') result.collidedZ = true;
+      if (axis === 'y') result.collidedY = true;
+    }
   }
+
+  return result;
 }
 
 export function testGround(
