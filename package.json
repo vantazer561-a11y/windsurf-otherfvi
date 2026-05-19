@@ -1,0 +1,21 @@
+{
+  "name": "windsurf-otherfvi",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Browser-based 3D FPS inspired by Counter-Strike 1.6 (Three.js + TypeScript + Vite)",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.160.0",
+    "typescript": "^5.4.0",
+    "vite": "^5.2.0"
+  }
+}

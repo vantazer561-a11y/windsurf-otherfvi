@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OTHERFVI — CS-style FPS</title>
+    <style>
+      html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: 'Courier New', monospace; color: #fff; }
+      #app { position: fixed; inset: 0; }
+      #app canvas { display: block; width: 100%; height: 100%; }
+      #overlay {
+        position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+        background: radial-gradient(circle at center, rgba(20,20,30,0.85), rgba(0,0,0,0.95));
+        pointer-events: auto; z-index: 10; transition: opacity 0.3s;
+      }
+      #overlay.hidden { opacity: 0; pointer-events: none; }
+      #overlay .panel { text-align: center; padding: 40px 60px; border: 1px solid #4a4a4a; background: rgba(0,0,0,0.7); }
+      #overlay h1 { margin: 0 0 12px; font-size: 36px; letter-spacing: 4px; color: #f7c948; }
+      #overlay p { margin: 8px 0; color: #ccc; font-size: 14px; }
+      #overlay button {
+        margin-top: 20px; padding: 12px 32px; font: bold 16px 'Courier New', monospace;
+        background: #f7c948; color: #111; border: none; cursor: pointer; letter-spacing: 2px;
+      }
+      #overlay button:hover { background: #ffdb6e; }
+      #hud-root { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="hud-root"></div>
+    <div id="overlay">
+      <div class="panel">
+        <h1>OTHERFVI</h1>
+        <p>Counter-Strike 1.6 inspired browser FPS</p>
+        <p style="opacity:0.7;font-size:12px;margin-top:16px;">WASD — move &nbsp;·&nbsp; MOUSE — aim &nbsp;·&nbsp; LMB — fire &nbsp;·&nbsp; R — reload &nbsp;·&nbsp; B — buy &nbsp;·&nbsp; 1-5 — weapons</p>
+        <button id="start-btn">CLICK TO PLAY</button>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
